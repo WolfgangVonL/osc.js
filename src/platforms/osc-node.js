@@ -54,6 +54,8 @@
         this.options.remoteAddress = this.options.remoteAddress || "127.0.0.1";
         this.options.remotePort = this.options.remotePort !== undefined ?
             this.options.remotePort : 57121;
+        
+        this.options.exclusiveSocket = this.options.exclusiveSocket || false;
 
         this.on("open", this.listen.bind(this));
 
@@ -88,8 +90,12 @@
 
             that.emit("open", that.socket);
         }
-
-        this.socket.bind(this.options.localPort, this.options.localAddress, onBound);
+        
+        if (this.options.exclusiveSocket === true) {   
+            this.socket.bind({port: this.options.localPort, address: this.options.localAddress, exclusive: true}, onBound);
+        } else {
+            this.socket.bind(this.options.localPort, this.options.localAddress, onBound);
+        }
     };
 
     p.listen = function () {
